@@ -17,6 +17,7 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
       "include": "build/uninstall.nsh"
     },
     "mac": {
