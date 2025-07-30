@@ -90,13 +90,11 @@ async function askAutoStart() {
 }
 
 app.whenReady().then(async () => {
-	const iconName = (() => {
-		switch (process.platform) {
-			case 'win32': return 'icon.ico';
-			case 'darwin': return 'icon.png';
-			default: return 'icon.png';
-		}
-	})();
+	const iconName = {
+		win32: 'icon.iconset/icon.ico',
+		darwin: 'icon.iconset/icon_32x32.png',
+		linux: 'icon.iconset/icon.png'
+	}[process.platform] || 'icon.png';
 
 	tray = new Tray(path.join(__dirname, iconName));
 	const contextMenu = Menu.buildFromTemplate([

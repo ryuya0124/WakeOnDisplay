@@ -30,7 +30,7 @@
           ]
         }
       ],
-      "icon": "icon.icns"
+      "icon": "assets/icon.icns"
     },
     "win": {
       "target": [
@@ -42,7 +42,7 @@
           ]
         }
       ],
-      "icon": "icon.ico"
+      "icon": "assets/icon.ico"
     }
   },
   "dependencies": {
