@@ -19,7 +19,7 @@ function wakeDisplay() {
 		exec(`powershell -command "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('{CAPSLOCK}'); Start-Sleep -Milliseconds 100; [System.Windows.Forms.SendKeys]::SendWait('{CAPSLOCK}')"`);
 		console.log('Display woken up on Windows');
 	} else if (platform === 'darwin') {
-		exec(`osascript -e 'tell application "System Events" to key code 123'`);
+		exec(`caffeinate -u -t 20`);
 		console.log('Display woken up on macOS');
 	}
 }
@@ -89,12 +89,11 @@ async function askAutoStart() {
   }
 }
 
-
 app.whenReady().then(async () => {
 	const iconName = (() => {
 		switch (process.platform) {
 			case 'win32': return 'icon.ico';
-			case 'darwin': return 'icon.icns';
+			case 'darwin': return 'icon.png';
 			default: return 'icon.png';
 		}
 	})();
