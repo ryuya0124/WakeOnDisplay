@@ -61,9 +61,9 @@ npm run dist
 
 - ディスプレイの復帰:
 
--- Windows: PowerShellを介してSystem.Windows.Forms.SendKeysを呼び出し、CAPSLOCKキーを2回押すキーストロークをシミュレートしてディスプレイを復帰させます。
+- Windows: PowerShellを介してSystem.Windows.Forms.SendKeysを呼び出し、CAPSLOCKキーを2回押すキーストロークをシミュレートしてディスプレイを復帰させます。
 
--- macOS: caffeinate -u -t 20コマンドを実行し、短時間システムをアクティブな状態にすることでディスプレイを復帰させます。
+- macOS: caffeinate -u -t 20コマンドを実行し、短時間システムをアクティブな状態にすることでディスプレイを復帰させます。
 
 ## 📜 ライセンス (License)
 This project is licensed under the MIT License.
