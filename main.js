@@ -43,8 +43,7 @@ async function updateTrayMenu() {
             type: 'checkbox',
             checked: autoLaunchEnabled,
             click: (menuItem) => {
-                // menuItem.checkedはクリック"後"の状態を反映します。
-                // これをそのまま「目標の状態」として使います。
+                // menuItem.checkedはクリック"後"の状態を反映
                 const targetState = menuItem.checked;
 
                 // 1. UIを即座に更新し、処理中は操作不能にする

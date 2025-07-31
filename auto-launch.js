@@ -8,13 +8,15 @@ const autoLauncher = new AutoLaunch({
     name: 'WakeOnDisplay',
 });
 
+const isDev = !app.isPackaged;
+
 /**
  * 自動起動を有効に
  * @returns {Promise<boolean>} 成功した場合は true, 失敗した場合は false
  */
 async function enableAutoLaunch() {
     try {
-        await autoLauncher.enable();
+        if(!isDev) await autoLauncher.enable();
         console.log('Auto-launch enabled.');
         return true;
     } catch (err) {
