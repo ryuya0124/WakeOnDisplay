@@ -59,13 +59,17 @@ WakeOnDisplayは、この問題を解決します。
 Bash
 
 # 依存関係をインストール
+```
 npm install
-
+```
 # 開発モードでアプリを起動
-npm start
-
+```
+npm run start
+```
 # アプリをパッケージング（ビルド）
-npm run make
+```
+npm run dist
+```
 動作の仕組み
 マジックパケットの監視: dgramモジュールを使用してUDPポート9でマジックパケット（FF FF FF FF FF FFから始まる102バイト以上のデータ）を待ち受けます。
 
@@ -77,25 +81,4 @@ macOS: caffeinate -u -t 20コマンドを実行し、短時間システムをア
 
 📜 ライセンス (License)
 This project is licensed under the MIT License.
-
-
-ソース
-
-
-
-
-
-
-
-
-
-
-
-動画
-
-Deep Research
-
-Canvas
-
-画像
 
