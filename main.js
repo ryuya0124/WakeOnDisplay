@@ -4,6 +4,7 @@ const dgram = require('dgram');
 const { exec } = require('child_process');
 const path = require('path');
 const { enableAutoLaunch, disableAutoLaunch, isAutoLaunchEnabled } = require('./auto-launch'); // 作成したモジュールをインポート
+const log = require('electron-log');
 
 let tray = null;
 
@@ -24,12 +25,35 @@ function wakeDisplay() {
 
 function setupWoLListener() {
     const server = dgram.createSocket('udp4');
+
+    server.on('error', (err) => {
+        // ★ console.error を log.error に変更
+        log.error(`WoLリスナーでエラーが発生しました: ${err.stack}`);
+        if (err.code === 'EADDRINUSE') {
+            dialog.showMessageBox({
+                type: 'error',
+                title: 'ポート競合エラー',
+                message: 'Wake-on-LANの待受ポート(UDP:9)が、他のアプリケーションによって既に使用されています。',
+                detail: 'このため、マジックパケットを監視する機能はご利用いただけません。他の機能は引き続き使用可能です。'
+            });
+        }
+        server.close();
+    });
+
     server.on('message', (msg) => {
         if (isMagicPacket(msg)) {
-            console.log('Magic Packet received!');
+            // ★ console.log を log.info に変更
+            log.info('マジックパケットを受信しました！');
             wakeDisplay();
         }
     });
+
+    server.on('listening', () => {
+        const address = server.address();
+        // ★ console.log を log.info に変更
+        log.info(`WoLリスナーが ${address.address}:${address.port} で待受を開始しました。`);
+    });
+
     server.bind(9);
 }
 
