@@ -30,7 +30,7 @@
           ]
         }
       ],
-      "icon": "assets/mac/icon_tray.iconset/icon_tray.icns"
+      "icon": "assets/mac/icon_sizes.icns"
     },
     "win": {
       "target": [

@@ -109,6 +109,11 @@ app.whenReady().then(async () => {
 	if (isFirstLaunch()) {
 		await askAutoStart();
 	}
+
+	// macOSでドックにアイコンを表示しない設定
+	if (process.platform === 'darwin') {
+		app.dock.hide(); // ドックアイコンを非表示にする
+	}
 });
 
 // トレイのみで動かすなら、ウィンドウ閉じたら終了しない
