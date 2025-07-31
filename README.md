@@ -56,7 +56,7 @@ npm start
 npm run make
 ```
 
-# 動作の仕組み
+## 動作の仕組み
 - マジックパケットの監視: dgramモジュールを使用してUDPポート9でマジックパケット（FF FF FF FF FF FFから始まる102バイト以上のデータ）を待ち受けます。
 
 - ディスプレイの復帰:
@@ -65,6 +65,6 @@ npm run make
 
 -- macOS: caffeinate -u -t 20コマンドを実行し、短時間システムをアクティブな状態にすることでディスプレイを復帰させます。
 
-# 📜 ライセンス (License)
+## 📜 ライセンス (License)
 This project is licensed under the MIT License.
-
+### 上記の文章はGeminiに書いてもらいました。学割最高！！
