@@ -91,10 +91,10 @@ async function askAutoStart() {
 
 app.whenReady().then(async () => {
 	const iconName = {
-		win32: 'assets/icon.ico',
-		darwin: 'assets/icon_tray.iconset/icon_32x32.png',
-		linux: 'assets/icon.png'
-	}[process.platform] || 'assets/icon.png';
+		win32: 'assets/windows/icon.ico',
+		darwin: 'assets/mac/icon_tray.iconset/icon_32x32.png',
+		linux: 'assets/icon_trans.png'
+	}[process.platform] || 'assets/icon_trans.png';
 
 	tray = new Tray(path.join(__dirname, iconName));
 

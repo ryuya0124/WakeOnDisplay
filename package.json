@@ -30,7 +30,7 @@
           ]
         }
       ],
-      "icon": "assets/icon.icns"
+      "icon": "assets/mac/icon_tray.iconset/icon_tray.icns"
     },
     "win": {
       "target": [
@@ -42,7 +42,7 @@
           ]
         }
       ],
-      "icon": "assets/icon.ico"
+      "icon": "assets/windows/icon.ico"
     }
   },
   "dependencies": {
