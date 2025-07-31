@@ -31,7 +31,7 @@ TailScaleなどを用いると外部ネットワークからでも、物理的�
 
 ## 🛠️ インストール (Installation)
 
-1.  **[リリースページ](https://github.com/ryuya0124/WakeOnDisplay/releases)** にアクセスします。（※URLは仮のものです）
+1.  **[リリースページ](https://github.com/ryuya0124/WakeOnDisplay/releases)** にアクセスします。
 2.  お使いのOS（Windows / macOS）に合った最新版のインストーラー（`.exe`や`.dmg`）をダウンロードします。
 3.  ダウンロードしたファイルを実行し、画面の指示に従ってインストールしてください。
 
