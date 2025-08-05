@@ -11,4 +11,12 @@
 
   ; マシン全体のスタートアップ登録を削除
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Run\WakeOnDisplay"
+
+  ; Windowsサービスを削除
+  ExecWait '"sc.exe" stop WakeOnDisplay' ; サービスを停止
+  ExecWait '"sc.exe" delete WakeOnDisplay' ; サービスを削除
+
+  ; node-windows が作成したログや関連ファイルを削除
+  Delete "$APPDATA\WakeOnDisplay\*.*"
+  RMDir "$APPDATA\WakeOnDisplay"
 !macroend

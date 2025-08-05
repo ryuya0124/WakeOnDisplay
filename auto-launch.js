@@ -1,6 +1,7 @@
 // auto-launch.js
 const AutoLaunch = require('auto-launch');
 const { app } = require('electron');
+const Service = process.platform === 'win32' ? require('node-windows').Service : null;
 
 const applescript = process.platform === 'darwin' ? require('applescript') : null;
 
@@ -15,13 +16,34 @@ const isDev = !app.isPackaged;
  * @returns {Promise<boolean>} 成功した場合は true, 失敗した場合は false
  */
 async function enableAutoLaunch() {
-    try {
-        if(!isDev) await autoLauncher.enable();
-        console.log('Auto-launch enabled.');
-        return true;
-    } catch (err) {
-        console.error('Failed to enable auto-launch:', err);
-        return false;
+    if (process.platform === 'win32') {
+        try {
+            const svc = new Service({
+                name: 'WakeOnDisplay',
+                description: 'WakeOnDisplay Windows Service',
+                script: app.getPath('exe'),
+            });
+
+            svc.on('install', () => {
+                svc.start();
+                console.log('Service installed and started.');
+            });
+
+            svc.install();
+            return true;
+        } catch (err) {
+            console.error('Failed to enable service:', err);
+            return false;
+        }
+    } else {
+        try {
+            if (!isDev) await autoLauncher.enable();
+            console.log('Auto-launch enabled.');
+            return true;
+        } catch (err) {
+            console.error('Failed to enable auto-launch:', err);
+            return false;
+        }
     }
 }
 
@@ -30,39 +52,32 @@ async function enableAutoLaunch() {
  * @returns {Promise<boolean>} 成功した場合は true, 失敗した場合は false
  */
 async function disableAutoLaunch() {
-    try {
-        await autoLauncher.disable();
-        console.log('auto-launchのdisable処理が完了しました。');
-
-    } catch (err) {
-        console.warn('auto-launchライブラリのdisable処理でエラーが発生しました。手動でのクリーンアップを続行します。', err.message);
-    }
-
-    if (process.platform === 'darwin' && applescript) {
-        const script = `
-            tell application "System Events"
-                if login item "WakeOnDisplay" exists then
-                    delete login item "WakeOnDisplay"
-                end if
-            end tell
-        `;
+    if (process.platform === 'win32') {
         try {
-            await new Promise((resolve, reject) => {
-                applescript.execString(script, (err, result) => {
-                    if (err) {
-                        console.error('手動でのAppleScriptクリーンアップに失敗しました。', err);
-                        reject(err);
-                        return;
-                    }
-                    console.log('手動でのAppleScriptクリーンアップが成功しました。');
-                    resolve(result);
-                });
+            const svc = new Service({
+                name: 'WakeOnDisplay',
             });
-        } catch (scriptErr) {
-            return false; // スクリプトの実行に失敗した場合はfalseを返す
+
+            svc.on('uninstall', () => {
+                console.log('Service uninstalled.');
+            });
+
+            svc.uninstall();
+            return true;
+        } catch (err) {
+            console.error('Failed to disable service:', err);
+            return false;
+        }
+    } else {
+        try {
+            await autoLauncher.disable();
+            console.log('Auto-launch disabled.');
+            return true;
+        } catch (err) {
+            console.error('Failed to disable auto-launch:', err);
+            return false;
         }
     }
-    return true;
 }
 
 /**
@@ -70,12 +85,17 @@ async function disableAutoLaunch() {
  * @returns {Promise<boolean>} 有効な場合は true, それ以外は false
  */
 async function isAutoLaunchEnabled() {
-    try {
-        const isEnabled = await autoLauncher.isEnabled();
-        return isEnabled;
-    } catch (err) {
-        console.error('Failed to check auto-launch status:', err);
-        return false;
+    if (process.platform === 'win32') {
+        // Windowsサービスの状態を確認するロジックを追加する場合はここに記述
+        return false; // 必要に応じて実装
+    } else {
+        try {
+            const isEnabled = await autoLauncher.isEnabled();
+            return isEnabled;
+        } catch (err) {
+            console.error('Failed to check auto-launch status:', err);
+            return false;
+        }
     }
 }
 
