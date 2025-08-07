@@ -14,27 +14,34 @@ $OutputEncoding = [Console]::OutputEncoding = [Text.UTF8Encoding]::new()
 chcp 65001
 */
 
+
 /**
- * 受信したバッファが、指定されたMACアドレス宛の有効なマジックパケットか判定します。
- * @param {Buffer} buffer - 受信したUDPパケットのバッファ。
- * @param {string} myMac - 比較対象となる自分自身のMACアドレス（例: 'aabbccddeeff'）。
- * @returns {boolean} 自分宛のマジックパケットであればtrue。
+ * @param {Buffer} buffer
+ * @param {string[]} myMacs 
  */
-function isMagicPacket(buffer, myMac) {
-    // 1. (長さ102バイト、先頭6バイトが0xFF)
-    if (buffer.length < 102 || buffer.toString('hex', 0, 6) !== 'ffffff') {
-        console.log('無効なマジックパケット: 長さまたは先頭の0xFFが不正です。');
-        log.error('無効なマジックパケット: 長さまたは先頭の0xFFが不正です。');
+function isMagicPacket(buffer, myMacs) {
+    // ★★★ 修正箇所: 'ffffff' を正しい12文字の 'ffffffffffff' に修正 ★★★
+    if (buffer.length < 102 || buffer.toString('hex', 0, 6) !== 'ffffffffffff') {
+        // この部分はもう不要かもしれませんが、念のため残しておきます
+        console.log('--- 無効なパケットを検知 ---');
+        console.log(`  理由: 長さまたは先頭6バイトが不正です。`);
+        console.log(`  実際の長さ: ${buffer.length} バイト`);
+        console.log(`  実際の先頭: ${buffer.slice(0, 16).toString('hex')}`);
+        console.log('--------------------------');
+        
         return false;
     }
 
-    // 2. パケットから宛先MACアドレスを抽出
+    // パケットから宛先MACアドレスを抽出
     const targetMac = buffer.toString('hex', 6, 12).toLowerCase();
-    console.log(`受信したMACアドレス: ${targetMac}`);
-    log.info(`受信したMACアドレス: ${targetMac}`);
-
-    // 3. 自分のMACアドレスと比較して結果を返す
-    return targetMac === myMac;
+    
+    // 自分のMACアドレスと比較
+    const isMatch = myMacs.includes(targetMac);
+    if (!isMatch) {
+        console.log(`他のPC宛のマジックパケットを検知 (Target: ${targetMac})`);
+    }
+    
+    return isMatch;
 }
 
 // 全ての有効なMACアドレスを配列で返す関数
