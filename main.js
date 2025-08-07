@@ -5,11 +5,58 @@ const { exec } = require('child_process');
 const path = require('path');
 const { enableAutoLaunch, disableAutoLaunch, isAutoLaunchEnabled } = require('./auto-launch'); // 作成したモジュールをインポート
 const log = require('electron-log');
+const os = require('os');
 
 let tray = null;
 
-function isMagicPacket(buffer) {
-    return buffer.length >= 102 && buffer.slice(0, 6).every(b => b === 0xff);
+/*Windowsターミナルはこうする
+$OutputEncoding = [Console]::OutputEncoding = [Text.UTF8Encoding]::new()
+chcp 65001
+*/
+
+/**
+ * 受信したバッファが、指定されたMACアドレス宛の有効なマジックパケットか判定します。
+ * @param {Buffer} buffer - 受信したUDPパケットのバッファ。
+ * @param {string} myMac - 比較対象となる自分自身のMACアドレス（例: 'aabbccddeeff'）。
+ * @returns {boolean} 自分宛のマジックパケットであればtrue。
+ */
+function isMagicPacket(buffer, myMac) {
+    // 1. (長さ102バイト、先頭6バイトが0xFF)
+    if (buffer.length < 102 || buffer.toString('hex', 0, 6) !== 'ffffff') {
+        console.log('無効なマジックパケット: 長さまたは先頭の0xFFが不正です。');
+        log.error('無効なマジックパケット: 長さまたは先頭の0xFFが不正です。');
+        return false;
+    }
+
+    // 2. パケットから宛先MACアドレスを抽出
+    const targetMac = buffer.toString('hex', 6, 12).toLowerCase();
+    console.log(`受信したMACアドレス: ${targetMac}`);
+    log.info(`受信したMACアドレス: ${targetMac}`);
+
+    // 3. 自分のMACアドレスと比較して結果を返す
+    return targetMac === myMac;
+}
+
+// 全ての有効なMACアドレスを配列で返す関数
+function getMyMacAddresses() {
+    try {
+        const macs = [];
+        const nets = os.networkInterfaces();
+        for (const name of Object.keys(nets)) {
+            for (const net of nets[name]) {
+                if (net.family === 'IPv4' && !net.internal && net.mac !== '00:00:00:00:00:00') {
+                    macs.push(net.mac.replace(/:/g, '').toLowerCase());
+                }
+            }
+        }
+        console.log(`有効なMACアドレス: ${macs.join(', ')}`);
+        log.info(`有効なMACアドレス: ${macs.join(', ')}`);
+        return macs;
+    } catch (err) {
+        console.error('MACアドレスの取得に失敗しました:', err);
+        log.error('MACアドレスの取得に失敗しました:', err);
+        return [];
+    }
 }
 
 function wakeDisplay() {
@@ -41,7 +88,7 @@ function setupWoLListener() {
     });
 
     server.on('message', (msg) => {
-        if (isMagicPacket(msg)) {
+        if (isMagicPacket(msg, getMyMacAddresses())) {
             // ★ console.log を log.info に変更
             log.info('マジックパケットを受信しました！');
             wakeDisplay();
