@@ -1,11 +1,12 @@
 // main.js
-const { app, Tray, Menu, dialog } = require('electron');
+const { app, Tray, Menu, dialog, shell } = require('electron');
 const dgram = require('dgram');
-const { exec } = require('child_process');
+const { exec, spawn } = require('child_process');
 const path = require('path');
 const { enableAutoLaunch, disableAutoLaunch, isAutoLaunchEnabled } = require('./auto-launch'); // 作成したモジュールをインポート
 const log = require('electron-log');
 const os = require('os');
+const { getStartupScriptsDir, ensureStartupScriptsDir, executeStartupScripts } = require('./script-runner');
 
 let tray = null;
 
@@ -77,6 +78,8 @@ function wakeDisplay() {
     }
 }
 
+// スクリプト実行関連は script-runner.js に分離
+
 function setupWoLListener() {
     const server = dgram.createSocket('udp4');
 
@@ -99,6 +102,8 @@ function setupWoLListener() {
             // ★ console.log を log.info に変更
             log.info('マジックパケットを受信しました！');
             wakeDisplay();
+            // ディスプレイを起こすトリガでスクリプト実行
+            executeStartupScripts();
         }
     });
 
@@ -161,6 +166,16 @@ async function updateTrayMenu() {
             }
         },
         { type: 'separator' },
+        {
+            label: 'スクリプトフォルダを開く',
+            click: async () => {
+                const dir = await ensureStartupScriptsDir();
+                if (dir) {
+                    await shell.openPath(dir);
+                }
+            }
+        },
+        { type: 'separator' },
         { label: '終了', click: () => app.quit() }
     ]);
 
@@ -168,6 +183,13 @@ async function updateTrayMenu() {
 }
 
 app.whenReady().then(async () => {
+    // 単一インスタンスロック（多重起動防止）
+    const gotLock = app.requestSingleInstanceLock();
+    if (!gotLock) {
+        app.quit();
+        return;
+    }
+
     const iconName = {
         win32: 'assets/windows/icon.ico',
         darwin: 'assets/mac/icon_tray.iconset/icon_32x32.png',
@@ -179,6 +201,9 @@ app.whenReady().then(async () => {
     setupWoLListener();
 
     await updateTrayMenu();
+
+    // スクリプトフォルダだけ用意（実行はWoL検知時）
+    await ensureStartupScriptsDir();
 
     if (process.platform === 'darwin') {
         app.dock.hide();
