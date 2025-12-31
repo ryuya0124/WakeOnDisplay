@@ -87,7 +87,14 @@ jobs:
             echo "==> staple: $dmg"
             xcrun stapler staple "$dmg"
             xcrun stapler validate "$dmg"
-            spctl --assess --verbose=4 --type open "$dmg"
+
+            # DMGをマウントして中のアプリを検証
+            echo "==> verify app inside: $dmg"
+            hdiutil attach "$dmg" -nobrowse -readonly
+            MOUNT_POINT=$(hdiutil info | grep -E '/Volumes/' | tail -1 | awk '{print $NF}')
+            APP_PATH="$MOUNT_POINT/WakeOnDisplay.app"
+            spctl -a -vvv -t execute "$APP_PATH"
+            hdiutil detach "$MOUNT_POINT"
           done
 
       - name: Upload Artifacts
