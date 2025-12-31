@@ -22,6 +22,7 @@
     },
     "electronLanguages": ["en-US", "ja"],
     "mac": {
+      "buildVersion": "1.0.0.1",
       "artifactName": "${productName}-${version}-${arch}.${ext}",
       "identity": "ryuya watanabe (FZ35ZF3CZV)",
       "target": [
