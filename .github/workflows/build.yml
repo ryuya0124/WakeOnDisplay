@@ -78,11 +78,9 @@ jobs:
 
             # DMGをマウントして中のアプリを検証
             echo "==> verify app inside: $dmg"
-            hdiutil attach "$dmg" -nobrowse -readonly
-            MOUNT_POINT=$(hdiutil info | grep -E '/Volumes/' | tail -1 | awk '{print $NF}')
-            APP_PATH="$MOUNT_POINT/WakeOnDisplay.app"
-            spctl -a -vvv -t execute "$APP_PATH"
-            hdiutil detach "$MOUNT_POINT"
+            hdiutil attach "$dmg" -nobrowse -readonly -mountpoint /tmp/dmg_mount
+            spctl -a -vvv -t execute "/tmp/dmg_mount/WakeOnDisplay.app"
+            hdiutil detach /tmp/dmg_mount
           done
 
       - name: Upload Artifacts
