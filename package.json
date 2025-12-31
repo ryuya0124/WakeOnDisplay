@@ -21,8 +21,9 @@
       "include": "build/uninstall.nsh"
     },
     "electronLanguages": ["en-US", "ja"],
+    "afterSign": "build/notarize.cjs",
+    "buildVersion": "1.0.0.1",
     "mac": {
-      "buildVersion": "1.0.0.1",
       "artifactName": "${productName}-${version}-${arch}.${ext}",
       "identity": "ryuya watanabe (FZ35ZF3CZV)",
       "target": [
@@ -38,8 +39,7 @@
       "hardenedRuntime": true,
       "gatekeeperAssess": false,
       "entitlements": "build/entitlements.mac.plist",
-      "entitlementsInherit": "build/entitlements.mac.plist",
-      "afterSign": "build/notarize.cjs"
+      "entitlementsInherit": "build/entitlements.mac.plist"
     },
     "win": {
       "target": [
