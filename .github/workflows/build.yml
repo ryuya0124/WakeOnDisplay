@@ -65,25 +65,14 @@ jobs:
           APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
           APPLE_API_KEY: ${{ runner.temp }}/AuthKey_${{ secrets.APPLE_API_KEY_ID }}.p8
 
-      # --- macOS: DMG を notarize + staple（配布物をGatekeeperで確実に通す） ---
-      - name: Notarize + Staple DMG (macOS)
+      # --- macOS: DMG に staple（afterSignで公証済みのため、stapleのみ実行） ---
+      - name: Staple + Verify DMG (macOS)
         if: matrix.os == 'macos-latest'
-        env:
-          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
-          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
         run: |
           set -euo pipefail
-          KEY_PATH="$RUNNER_TEMP/AuthKey_${APPLE_API_KEY_ID}.p8"
 
           shopt -s nullglob
           for dmg in dist/*.dmg; do
-            echo "==> submit: $dmg"
-            xcrun notarytool submit "$dmg" \
-              --key "$KEY_PATH" \
-              --key-id "$APPLE_API_KEY_ID" \
-              --issuer "$APPLE_API_ISSUER" \
-              --wait
-
             echo "==> staple: $dmg"
             xcrun stapler staple "$dmg"
             xcrun stapler validate "$dmg"
