@@ -21,7 +21,7 @@
       "include": "build/uninstall.nsh"
     },
     "electronLanguages": ["en-US", "ja"],
-    "buildVersion": "1.0.0.2",
+    "buildVersion": "1.0.0.5",
     "mac": {
       "artifactName": "${productName}-${version}-${arch}.${ext}",
       "identity": "ryuya watanabe (FZ35ZF3CZV)",
