@@ -21,7 +21,7 @@
       "include": "build/uninstall.nsh"
     },
     "electronLanguages": ["en-US", "ja"],
-    "buildVersion": "1.0.0.7",
+    "buildVersion": "1.0.0.8",
     "mac": {
       "artifactName": "${productName}-${version}-${arch}.${ext}",
       "identity": "ryuya watanabe (FZ35ZF3CZV)",
@@ -42,6 +42,7 @@
       "notarize": false
     },
     "afterSign": "build/notarize.js",
+    "afterAllArtifactBuild": "build/notarizeDmg.js",
     "win": {
       "target": [
         {

@@ -65,16 +65,15 @@ jobs:
           APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
           APPLE_API_KEY: ${{ runner.temp }}/AuthKey_${{ secrets.APPLE_API_KEY_ID }}.p8
 
-      # --- macOS: DMG に staple（afterSignで公証済みのため、stapleのみ実行） ---
-      - name: Staple + Verify DMG (macOS)
+      # --- macOS: DMG 検証（afterAllArtifactBuildで公証済み） ---
+      - name: Verify DMG (macOS)
         if: matrix.os == 'macos-latest'
         run: |
           set -euo pipefail
 
           shopt -s nullglob
           for dmg in dist/*.dmg; do
-            echo "==> staple: $dmg"
-            xcrun stapler staple "$dmg"
+            echo "==> validate staple: $dmg"
             xcrun stapler validate "$dmg"
 
             # DMGをマウントして中のアプリを検証
