@@ -42,6 +42,19 @@ async function notarizeDmg(dmgPath, apiInfo) {
     console.log(`Stapling: ${dmgPath}`);
     execSync(`xcrun stapler staple "${dmgPath}"`, { stdio: 'inherit' });
     
+    // 検証
+    console.log(`Validating staple: ${dmgPath}`);
+    execSync(`xcrun stapler validate "${dmgPath}"`, { stdio: 'inherit' });
+    
+    // アプリを検証
+    console.log(`Verifying app inside DMG...`);
+    execSync(`hdiutil attach "${dmgPath}" -nobrowse -readonly -mountpoint /tmp/dmg_verify`, { stdio: 'inherit' });
+    try {
+      execSync(`spctl -a -vvv -t execute "/tmp/dmg_verify/WakeOnDisplay.app"`, { stdio: 'inherit' });
+    } finally {
+      execSync(`hdiutil detach /tmp/dmg_verify`, { stdio: 'inherit' });
+    }
+    
     console.log(`DMG notarization complete: ${dmgPath}`);
   } catch (error) {
     console.error(`DMG notarization failed: ${dmgPath}`, error);
