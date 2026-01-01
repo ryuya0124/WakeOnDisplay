@@ -1,0 +1,35 @@
+# Fastfile - macOS Developer ID証明書のセットアップとビルド自動化
+#
+# 使用方法:
+#   fastlane mac setup_certificates  - 証明書をキーチェーンにインストール
+#
+# CI環境では環境変数 MATCH_PASSWORD と MATCH_GIT_BASIC_AUTHORIZATION が必要
+
+default_platform(:mac)
+
+platform :mac do
+  desc "Developer ID証明書をセットアップ"
+  lane :setup_certificates do
+    # CI環境では一時キーチェーンを作成
+    if ENV["CI"]
+      create_keychain(
+        name: "ci_keychain",
+        password: ENV["MATCH_PASSWORD"],
+        default_keychain: true,
+        unlock: true,
+        timeout: 3600,
+        lock_when_sleeps: false
+      )
+    end
+
+    match(
+      type: "developer_id",
+      readonly: true,
+      skip_provisioning_profiles: true,
+      keychain_name: ENV["CI"] ? "ci_keychain" : nil,
+      keychain_password: ENV["CI"] ? ENV["MATCH_PASSWORD"] : nil
+    )
+
+    UI.success("Developer ID証明書のセットアップが完了しました")
+  end
+end

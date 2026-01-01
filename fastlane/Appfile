@@ -1,0 +1,6 @@
+# Appfile - アプリ識別情報
+#
+# Fastlaneで使用するアプリとチームの情報
+
+app_identifier("net.ryuya-dev.net.wod")
+team_id("FZ35ZF3CZV")

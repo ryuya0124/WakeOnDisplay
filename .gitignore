@@ -34,3 +34,4 @@ yarn.lock
 .env.production.local
 package-lock.json
 electron-builder.env
+fastlane/report.xml

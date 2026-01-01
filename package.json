@@ -6,7 +6,8 @@
   "author": "ryuya",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder --publish never"
+    "dist": "node build/build-mac.js --publish never",
+    "dist:skip-cert": "electron-builder --publish never"
   },
   "build": {
     "appId": "net.ryuya-dev.net.wod",
