@@ -12,5 +12,7 @@ app_identifier(["net.ryuya-dev.net.wod"])
 
 team_id("FZ35ZF3CZV")
 
+platform("macos")
+
 # 詳細オプションは `fastlane match --help` を参照
 # ドキュメント: https://docs.fastlane.tools/actions/match

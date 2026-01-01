@@ -30,6 +30,7 @@ platform :mac do
       # verbose: trueでデバッグ情報を出力
       match(
         type: "developer_id",
+        platform: "macos",
         readonly: true,
         skip_provisioning_profiles: true,
         keychain_name: keychain_name,
