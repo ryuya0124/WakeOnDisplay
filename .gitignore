@@ -35,3 +35,4 @@ yarn.lock
 package-lock.json
 electron-builder.env
 fastlane/report.xml
+verify_p12.sh
