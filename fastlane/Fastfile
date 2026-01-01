@@ -12,23 +12,38 @@ platform :mac do
   lane :setup_certificates do
     # CI環境では一時キーチェーンを作成
     if ENV["CI"]
+      keychain_name = "ci_keychain"
+      keychain_password = ENV["MATCH_PASSWORD"]
+      keychain_path = File.expand_path("~/Library/Keychains/#{keychain_name}-db")
+
       create_keychain(
-        name: "ci_keychain",
-        password: ENV["MATCH_PASSWORD"],
+        name: keychain_name,
+        password: keychain_password,
         default_keychain: true,
         unlock: true,
         timeout: 3600,
-        lock_when_sleeps: false
+        lock_when_sleeps: false,
+        add_to_search_list: true
+      )
+
+      match(
+        type: "developer_id",
+        readonly: true,
+        skip_provisioning_profiles: true,
+        keychain_name: keychain_name,
+        keychain_password: keychain_password
+      )
+
+      # codesignがキーチェーンにアクセスできるようにパーティションリストを設定
+      sh("security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k \"#{keychain_password}\" #{keychain_path}")
+    else
+      # ローカル環境: デフォルトキーチェーンを使用
+      match(
+        type: "developer_id",
+        readonly: true,
+        skip_provisioning_profiles: true
       )
     end
-
-    match(
-      type: "developer_id",
-      readonly: true,
-      skip_provisioning_profiles: true,
-      keychain_name: ENV["CI"] ? "ci_keychain" : nil,
-      keychain_password: ENV["CI"] ? ENV["MATCH_PASSWORD"] : nil
-    )
 
     UI.success("Developer ID証明書のセットアップが完了しました")
   end
