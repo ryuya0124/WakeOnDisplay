@@ -10,12 +10,12 @@ default_platform(:mac)
 platform :mac do
   desc "Developer ID証明書をセットアップ"
   lane :setup_certificates do
-    # CI環境では一時キーチェーンを作成
     if ENV["CI"]
       keychain_name = "ci_keychain"
       keychain_password = ENV["MATCH_PASSWORD"]
       keychain_path = File.expand_path("~/Library/Keychains/#{keychain_name}-db")
 
+      # キーチェーンを作成
       create_keychain(
         name: keychain_name,
         password: keychain_password,
@@ -26,23 +26,27 @@ platform :mac do
         add_to_search_list: true
       )
 
+      # matchで証明書をインストール
+      # verbose: trueでデバッグ情報を出力
       match(
         type: "developer_id",
         readonly: true,
         skip_provisioning_profiles: true,
         keychain_name: keychain_name,
-        keychain_password: keychain_password
+        keychain_password: keychain_password,
+        verbose: true
       )
 
-      # codesignがキーチェーンにアクセスできるようにパーティションリストを設定
-      # エラーが発生しても続行（matchが既に設定している場合がある）
+      # パーティションリストを設定
       begin
-        sh("security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k \"#{keychain_password}\" #{keychain_path}")
+        sh("security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k '#{keychain_password}' '#{keychain_path}'")
       rescue => e
         UI.important("Partition list setting skipped: #{e.message}")
       end
+
+      # デバッグ: キーチェーンの内容を確認
+      sh("security find-identity -v -p codesigning '#{keychain_path}'", log: true) rescue nil
     else
-      # ローカル環境: デフォルトキーチェーンを使用
       match(
         type: "developer_id",
         readonly: true,
