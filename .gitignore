@@ -36,3 +36,7 @@ package-lock.json
 electron-builder.env
 fastlane/report.xml
 verify_p12.sh
+create_mac_native_p12.sh
+set_p12_pass.sh
+remove_p12_pass.sh
+create_verified_nopass_p12.sh
