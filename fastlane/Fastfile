@@ -35,7 +35,12 @@ platform :mac do
       )
 
       # codesignがキーチェーンにアクセスできるようにパーティションリストを設定
-      sh("security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k \"#{keychain_password}\" #{keychain_path}")
+      # エラーが発生しても続行（matchが既に設定している場合がある）
+      begin
+        sh("security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k \"#{keychain_password}\" #{keychain_path}")
+      rescue => e
+        UI.important("Partition list setting skipped: #{e.message}")
+      end
     else
       # ローカル環境: デフォルトキーチェーンを使用
       match(
