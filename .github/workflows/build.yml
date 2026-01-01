@@ -70,6 +70,18 @@ jobs:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
 
+      - name: Debug keychain (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          echo "=== Keychain list ==="
+          security list-keychains
+          echo "=== Default keychain ==="
+          security default-keychain
+          echo "=== Identities in ci_keychain ==="
+          security find-identity -v -p codesigning ~/Library/Keychains/ci_keychain-db || true
+          echo "=== All identities ==="
+          security find-identity -v -p codesigning || true
+
       - name: Build for macOS
         if: matrix.os == 'macos-latest'
         run: pnpm run dist:skip-cert
