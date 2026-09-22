@@ -117,10 +117,10 @@ jobs:
           set -euo pipefail
           dmg="$(find dist -maxdepth 1 -name '*.dmg' -print -quit)"
           test -n "$dmg"
-          xcrun stapler validate "$dmg"
           mountpoint="$(mktemp -d)"
           hdiutil attach "$dmg" -nobrowse -readonly -mountpoint "$mountpoint"
           trap 'hdiutil detach "$mountpoint" || true' EXIT
+          xcrun stapler validate "$mountpoint/WakeOnDisplay.app"
           codesign --verify --deep --strict --verbose=2 "$mountpoint/WakeOnDisplay.app"
           spctl --assess --type execute --verbose=2 "$mountpoint/WakeOnDisplay.app"
       - uses: actions/upload-artifact@v4
