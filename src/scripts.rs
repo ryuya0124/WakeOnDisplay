@@ -200,13 +200,37 @@ fn command_for(path: &Path) -> Option<(&'static str, Vec<String>)> {
 
 #[cfg(target_os = "windows")]
 fn is_elevated() -> bool {
-    Command::new("whoami.exe")
-        .arg("/groups")
-        .output()
-        .ok()
-        .filter(|output| output.status.success())
-        .map(|output| String::from_utf8_lossy(&output.stdout).contains("S-1-5-32-544"))
-        .unwrap_or(false)
+    use std::mem::size_of;
+    use windows_sys::Win32::Foundation::{CloseHandle, HANDLE};
+    use windows_sys::Win32::Security::{
+        GetTokenInformation, TOKEN_ELEVATION, TOKEN_QUERY, TokenElevation,
+    };
+    use windows_sys::Win32::System::Threading::{GetCurrentProcess, OpenProcessToken};
+
+    let mut token: HANDLE = std::ptr::null_mut();
+    // SAFETY: `token` is a valid writable out-parameter and the pseudo-handle is
+    // valid for the duration of this call.
+    if unsafe { OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &mut token) } == 0 {
+        return false;
+    }
+
+    let mut elevation = TOKEN_ELEVATION::default();
+    let mut returned_size = 0;
+    // SAFETY: the output buffer points to a correctly sized TOKEN_ELEVATION and
+    // the process token remains open until after the query completes.
+    let queried = unsafe {
+        GetTokenInformation(
+            token,
+            TokenElevation,
+            (&mut elevation as *mut TOKEN_ELEVATION).cast(),
+            size_of::<TOKEN_ELEVATION>() as u32,
+            &mut returned_size,
+        )
+    } != 0;
+    // SAFETY: `token` was returned by OpenProcessToken and is closed exactly once.
+    unsafe { CloseHandle(token) };
+
+    queried && elevation.TokenIsElevated != 0
 }
 
 #[cfg(target_os = "macos")]
