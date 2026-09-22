@@ -1,0 +1,75 @@
+[package]
+name = "wakeondisplay"
+version = "2.0.0"
+edition = "2024"
+rust-version = "1.90"
+description = "Wake a sleeping display when this computer receives its Wake-on-LAN magic packet"
+authors = ["ryuya"]
+license = "MIT"
+repository = "https://github.com/ryuya0124/WakeOnDisplay"
+homepage = "https://github.com/ryuya0124/WakeOnDisplay"
+build = "build.rs"
+
+[[bin]]
+name = "wakeondisplay"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1.0.104"
+auto-launch = "0.6.0"
+directories = "6.0.0"
+image = { version = "0.25.10", default-features = false, features = ["png"] }
+network-interface = "2.0.5"
+open = "5.3.3"
+single-instance = "0.3.3"
+tracing = "0.1.44"
+tracing-appender = "0.2.5"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
+tray-icon = { version = "0.25.1", default-features = false }
+winit = { version = "0.30.12", default-features = false }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61.2", features = [
+  "Win32_Foundation",
+  "Win32_UI_WindowsAndMessaging",
+] }
+
+[target.'cfg(windows)'.build-dependencies]
+winresource = "0.1.31"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
+
+[package.metadata.packager]
+product-name = "WakeOnDisplay"
+identifier = "net.ryuya-dev.net.wod"
+formats = ["nsis", "dmg"]
+out-dir = "dist"
+icons = [
+  "assets/windows/icon.ico",
+  "assets/mac/icon_sizes.icns",
+]
+license-file = "LICENSE"
+category = "Utility"
+
+[[package.metadata.packager.binaries]]
+path = "wakeondisplay"
+main = true
+
+[package.metadata.packager.macos]
+minimum-system-version = "13.0"
+background-app = true
+entitlements = "build/entitlements.mac.plist"
+signing-identity = "Developer ID Application: ryuya watanabe (FZ35ZF3CZV)"
+
+[package.metadata.packager.nsis]
+installer-icon = "assets/windows/icon.ico"
+installer-mode = "currentUser"
+languages = ["English", "Japanese"]
+
+[package.metadata.packager.dmg]
+window-size = { width = 660, height = 400 }
+app-position = { x = 180, y = 190 }
+application-folder-position = { x = 480, y = 190 }
