@@ -20,6 +20,7 @@ pub fn ensure_startup_scripts_dir() -> Result<PathBuf> {
     Ok(path)
 }
 
+#[cfg(target_os = "macos")]
 pub fn single_instance_path() -> Result<PathBuf> {
     let directory = app_data_dir()?;
     std::fs::create_dir_all(&directory)?;
